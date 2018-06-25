@@ -2,10 +2,10 @@ import numpy as np
 
 class SlugMachine:
 
-    def __init__(self, tape_width, slug):
+    def __init__(self, tape_width, slug, initial_tape=None):
         self.slug = slug
         self.tape_width = tape_width
-        self.tape = [np.zeros((self.tape_width,), dtype=np.bool), np.zeros((self.tape_width,), dtype=np.bool)]
+        self.tape = initial_tape or [np.zeros((self.tape_width,), dtype=np.bool), np.zeros((self.tape_width,), dtype=np.bool)]
         self.tape[0][0] = True
         self.pos = 0
 

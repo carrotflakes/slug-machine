@@ -50,15 +50,35 @@ class TFSlug(Slug):
         self.state = state[0]
         return tape[0][0]
 
-    def learn(self, slug_trace, window=128, epoch=100):
-        tape_before, tape_after = slug_trace.get_tape_transitions()
+    def learn(self, slug_trace, window_size=128, epoch=100):
+        episodes = slug_trace.get_tape_transitions()
+        batch_size = len(episodes)
+        batches = []
+        while sum(map(len, episodes)) > 0:
+            tape_before, tape_after = [], []
+            size = min(window_size, max(map(len, episodes)))
+            for episode in episodes:
+                pairs = episode[:size]
+                pairs += [(np.zeros((self.tape_width,), dtype=np.bool),) * 2] * (size - len(pairs))
+                episode[:size] = []
+                t1, t2 = zip(*pairs)
+                tape_before.append(t1)
+                tape_after.append(t2)
+            batches.append((tape_before, tape_after))
+
+        print(batches)
+
         for i in range(epoch):
-            loss, _, next_state = self.sess.run([self.loss, self.optimize, self.next_state], {
-                self.tape_pl: [tape_before],
-                self.next_tape_pl: [tape_after],
-                self.state_pl: [np.zeros((self.state_size,), dtype=np.float32)]
-            })
-            print(loss)
+            state = [np.zeros((self.state_size,), dtype=np.float32)] * batch_size
+            total_loss = 0
+            for tape_before, tape_after in batches:
+                loss, _, state = self.sess.run([self.loss, self.optimize, self.next_state], {
+                    self.tape_pl: tape_before,
+                    self.next_tape_pl: tape_after,
+                    self.state_pl: state
+                })
+                total_loss += loss
+            print(total_loss)
 
 
 if __name__ == '__main__':

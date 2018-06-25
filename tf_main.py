@@ -5,12 +5,12 @@ from slug_trace import SlugTrace
 
 tape_width = 8
 
-trace = SlugTrace.load('trace.txt', tape_width=tape_width)
+trace = SlugTrace.load('trace_test.txt', tape_width=tape_width)
 
 slug = TFSlug(tape_width=tape_width, state_size=8)
 slug.learn(trace, epoch=500)
 
-sm = SlugMachine(tape_width, slug)
+sm = SlugMachine(tape_width, slug, trace.episodes[2][0])
 
 sm.print()
 for i in range(20):
