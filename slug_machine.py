@@ -27,13 +27,16 @@ class SlugMachine:
 
     def print(self):
         for i, chunk in enumerate(self.tape):
-            print(''.join(str(int(c)) for c in chunk), end='')
+            print(self.line_dump(chunk), end='')
             if i == self.pos:
                 print(' <- ', end='')
                 self.slug.print()
             else:
                 print()
         print()
+
+    def line_dump(self, chunk):
+        return ''.join(str(int(c)) for c in chunk)
 
 class Slug:
 

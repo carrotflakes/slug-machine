@@ -1,7 +1,7 @@
 import numpy as np
 from slug_machine import SlugMachine, Slug
 
-tape_width = 16
+tape_width = 32
 
 class MySlug(Slug):
 
@@ -19,4 +19,7 @@ sm.print()
 
 for i in range(20):
     sm.step()
-    sm.print()
+    if sm.pos == 0:
+        sm.print()
+    if sm.end():
+        break
