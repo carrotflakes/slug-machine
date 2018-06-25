@@ -23,12 +23,16 @@ class TFSlug(Slug):
             kernel_initializer=tf.random_uniform_initializer(-0.01, 0.01, seed=0),
             bias_initializer=tf.random_uniform_initializer(-0.01, 0.01, seed=0))
 
+        output_layer = core_layers.Dense(self.tape_width, activation=None, use_bias=False)
+
         tape = tf.cast(self.tape_pl, tf.float32)
 
         next_tape_raw, self.next_state = tf.nn.dynamic_rnn(
             cell,
             tape,
             initial_state=self.state_pl)
+
+        next_tape_raw = output_layer.apply(next_tape_raw)
 
         self.next_tape = tf.sign(next_tape_raw) > 0
 
@@ -65,8 +69,6 @@ class TFSlug(Slug):
                 tape_before.append(t1)
                 tape_after.append(t2)
             batches.append((tape_before, tape_after))
-
-        print(batches)
 
         for i in range(epoch):
             state = [np.zeros((self.state_size,), dtype=np.float32)] * batch_size

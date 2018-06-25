@@ -1,25 +1,39 @@
-import numpy as np
 from slug_machine import SlugMachine, Slug
+from tf_slug import TFSlug
+from slug_trace import SlugTrace
+import argparse
 
-tape_width = 32
-
-class MySlug(Slug):
-
-    def __init__(self):
-        self.i = 1
-
-    def step(self, chunk):
-        n = self.i#sum(v * 2 ** i for i, v in enumerate(chunk)) + 1
-        self.i = (self.i + 1) % 10
-        return np.array([n & (2 ** i) for i in range(tape_width)])
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('trace_file', type=str)
+parser.add_argument('--tape_width', type=int, default=8)
+parser.add_argument('--state_size', type=int, default=8)
+parser.add_argument('--epoch', type=int, default=500)
+parser.add_argument('--initial_tape_idx', type=int, default=0)
 
 
-sm = SlugMachine(tape_width, MySlug())
-sm.print()
+if __name__ == '__main__':
+    args = parser.parse_args()
 
-for i in range(20):
-    sm.step()
-    if sm.pos == 0:
-        sm.print()
-    if sm.end():
-        break
+    trace_file = args.trace_file
+    tape_width = args.tape_width
+    state_size = args.state_size
+    epoch = args.epoch
+    initial_tape_idx = args.initial_tape_idx
+
+    trace = SlugTrace.load(trace_file, tape_width=tape_width)
+
+    slug = TFSlug(tape_width=tape_width, state_size=state_size)
+    slug.learn(trace, epoch=epoch)
+
+    sm = SlugMachine(tape_width, slug, trace.episodes[initial_tape_idx][0])
+
+    sm.print()
+    for i in range(30):
+        sm.step()
+        if sm.pos == 0:
+            sm.print()
+        if sm.end():
+            break
+
+    print('last')
+    sm.print()
