@@ -22,8 +22,9 @@ class TFSlug(Slug):
             activation=tf.nn.elu,
             kernel_initializer=tf.random_uniform_initializer(-0.01, 0.01, seed=0),
             bias_initializer=tf.random_uniform_initializer(-0.01, 0.01, seed=0))
-
-        output_layer = core_layers.Dense(self.tape_width, activation=None, use_bias=False)
+        cell = tf.contrib.rnn.OutputProjectionWrapper(
+            cell,
+            self.tape_width)
 
         tape = tf.cast(self.tape_pl, tf.float32)
 
@@ -31,8 +32,6 @@ class TFSlug(Slug):
             cell,
             tape,
             initial_state=self.state_pl)
-
-        next_tape_raw = output_layer.apply(next_tape_raw)
 
         self.next_tape = tf.sign(next_tape_raw) > 0
 

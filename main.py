@@ -28,7 +28,7 @@ if __name__ == '__main__':
     sm = SlugMachine(tape_width, slug, trace.episodes[initial_tape_idx][0])
 
     sm.print()
-    for i in range(30):
+    for i in range(50):
         sm.step()
         if sm.pos == 0:
             sm.print()
