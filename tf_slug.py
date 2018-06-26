@@ -53,6 +53,9 @@ class TFSlug(Slug):
         self.state = state[0]
         return tape[0][0]
 
+    def reset(self):
+        self.state = np.zeros((self.state_size,), dtype=np.float32)
+
     def learn(self, slug_trace, window_size=128, epoch=100):
         episodes = slug_trace.get_tape_transitions()
         batch_size = len(episodes)

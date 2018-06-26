@@ -8,7 +8,7 @@ parser.add_argument('trace_file', type=str)
 parser.add_argument('--tape_width', type=int, default=8)
 parser.add_argument('--state_size', type=int, default=8)
 parser.add_argument('--epoch', type=int, default=500)
-parser.add_argument('--initial_tape_idx', type=int, default=0)
+parser.add_argument('--initial_trace_file', type=str)
 
 
 if __name__ == '__main__':
@@ -18,22 +18,26 @@ if __name__ == '__main__':
     tape_width = args.tape_width
     state_size = args.state_size
     epoch = args.epoch
-    initial_tape_idx = args.initial_tape_idx
+    initial_trace_file = args.initial_trace_file or trace_file
 
     trace = SlugTrace.load(trace_file, tape_width=tape_width)
 
     slug = TFSlug(tape_width=tape_width, state_size=state_size)
     slug.learn(trace, epoch=epoch)
 
-    sm = SlugMachine(tape_width, slug, trace.episodes[initial_tape_idx][0])
+    initial_trace = SlugTrace.load(initial_trace_file, tape_width=tape_width)
 
-    sm.print()
-    for i in range(50):
-        sm.step()
-        if sm.pos == 0:
-            sm.print()
-        if sm.end():
-            break
+    for episode in initial_trace.episodes:
+        slug.reset()
+        sm = SlugMachine(tape_width, slug, episode[0])
 
-    print('last')
-    sm.print()
+        sm.print()
+        for i in range(50):
+            sm.step()
+            if sm.pos == 0:
+                sm.print()
+            if sm.end():
+                break
+
+        print('last')
+        sm.print()

@@ -46,5 +46,8 @@ class Slug:
     def step(self, chunk):
         raise NotImplemented()
 
+    def reset(self):
+        raise NotImplemented()
+
     def print(self):
         print("(^-^)")
