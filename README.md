@@ -8,9 +8,9 @@ Slug machineは計算モデルの一つです。
 
 # 実行
 ```
-$ python main.py trace_test.txt --tape_width=8 --state_size=8 --initial_tape_idx=2
+$ python main.py trace_test.txt --tape_width=8 --state_size=8
 ```
 
 ```
-$ python main.py trace_helloworld.txt --tape_width=8 --state_size=32 --initial_tape_idx=0 --epoch=1000
+$ python main.py trace_helloworld.txt --tape_width=8 --state_size=32 --epoch=1000
 ```
